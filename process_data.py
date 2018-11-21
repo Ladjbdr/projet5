@@ -43,6 +43,15 @@ def get_category_products(categories, category_id):
 def main():
     categories = get_categories()
     products = get_category_products(categories, 1)
+    print(products[0]['code'])
+                
+    keys = ('code', 'product_name_fr', 'ingredients_text_fr', 'stores', 'nutrition_grade_fr')
+    product = [(product['code'], 
+               product['product_name_fr'],
+               product['ingredients_text_fr'],
+               product['stores'],
+               product['nutrition_grade_fr']
+               ) for product in products if any(keys) in product.keys()]
 
 
 if __name__=='__main__':
