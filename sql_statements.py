@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-
+sql statements to create and fill database tables
 """
 
 CREATE_CATEGORIES = """CREATE TABLE IF NOT EXISTS categories (
