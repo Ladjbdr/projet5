@@ -34,18 +34,22 @@ def main():
     product = []
     for idx in range(len(categories_)):
         products = get_category_products(categories_, idx + 1)
-        element = [(product['code'],
-				  product['product_name_fr'],
-				  product['ingredients_text_fr'],
-				  product['stores'],
-                  product['nutrition_grade_fr']) 
-				  for product in products 
-                  if 'nutrition_grade_fr' in product.keys() 
-                  and product['code'] 
-                  and product['product_name_fr'] 
-                  and product['ingredients_text_fr'] 
-                  and product['stores'] 
-                  and product['nutrition_grade_fr'] != '']
+        element = [
+                    (
+                        product['code'],
+				        product['product_name_fr'],
+				        product['ingredients_text_fr'],
+				        product['stores'],
+                        product['nutrition_grade_fr']
+                    ) 
+				        for product in products 
+                        if 'nutrition_grade_fr' in product.keys() 
+                        and product['code'] 
+                        and product['product_name_fr'] 
+                        and product['ingredients_text_fr'] 
+                        and product['stores'] 
+                        and product['nutrition_grade_fr'] != ''
+                ]
         product += element
 
     with conn:
