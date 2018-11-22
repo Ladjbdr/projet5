@@ -15,7 +15,7 @@ def get_categories():
     url = 'https://fr.openfoodfacts.org/categories.json'
     response = requests.get(url)
     res_json = response.json()
-    categories = res_json['tags'][:5]
+    categories = res_json['tags'][5:10]
 
     return categories
 
