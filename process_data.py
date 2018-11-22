@@ -24,7 +24,7 @@ def get_category_products(categories, category_id):
     """
     retrieving category products.
     """
-    category = categories[category_id - 1]['id'].strip('en:')
+    category = categories[category_id - 1]['id'].replace('en:', '')
     url = 'https://fr.openfoodfacts.org/cgi/search.pl'
     payload = {'json' :1,
                'action': 'process',
@@ -42,16 +42,20 @@ def get_category_products(categories, category_id):
 
 def main():
     categories = get_categories()
-    products = get_category_products(categories, 1)
-    print(products[0]['code'])
+    print(type(categories))
+    for category in categories:
+        print(category['id'])
+    products = get_category_products(categories, 2)
+    print(len(products))
+    
                 
-    keys = ('code', 'product_name_fr', 'ingredients_text_fr', 'stores', 'nutrition_grade_fr')
+    """keys = ('code', 'product_name_fr', 'ingredients_text_fr', 'stores', 'nutrition_grade_fr')
     product = [(product['code'], 
                product['product_name_fr'],
                product['ingredients_text_fr'],
                product['stores'],
                product['nutrition_grade_fr']
-               ) for product in products if any(keys) in product.keys()]
+               ) for product in products if 'code' in product.keys()]"""
 
 
 if __name__=='__main__':

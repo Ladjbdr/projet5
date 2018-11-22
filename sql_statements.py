@@ -46,3 +46,4 @@ INSERT_INTO_PRODUCTS = """INSERT INTO products (code, name, ingredients, stores,
 
 INSERT_INTO_NUTRITION_GRADE = """INSERT INTO nutrition_grade (id, grade)
                                  VALUES (?, ?);"""
+                                 
