@@ -40,7 +40,9 @@ def main():
 				        product['product_name_fr'],
 				        product['ingredients_text_fr'],
 				        product['stores'],
-                        product['nutrition_grade_fr']
+                        product['nutrition_grade_fr'],
+                        idx + 1
+
                     ) 
 				        for product in products 
                         if 'nutrition_grade_fr' in product.keys() 
@@ -56,7 +58,7 @@ def main():
         create_table(conn, CREATE_CATEGORIES)
         create_table(conn, CREATE_PRODUCTS)
         create_table(conn, CREATE_NUTRITION_GRADE)
-        create_table(conn, CREATE_PRODUCT_CATEGORY)
+        #create_table(conn, CREATE_PRODUCT_CATEGORY)
         create_row(conn, INSERT_INTO_CATEGORIES, category)
         create_row(conn, INSERT_INTO_NUTRITION_GRADE, nutrition_grade)
         create_row(conn, INSERT_INTO_PRODUCTS, product)
