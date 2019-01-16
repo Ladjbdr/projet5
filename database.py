@@ -4,65 +4,81 @@
 """
 
 """
-from sql_statements import *
-from process_data import get_categories, get_category_products
 
-import sqlite3
+import os
 
-def create_connection(db_file='pure_beurre.db'):
-    conn = sqlite3.connect(db_file)
-    return conn
+import records
 
-
-def create_table(conn, sql_statement):
-    c = conn.cursor()
-    c.execute(sql_statement)
+import sql_statements as sql
+from data import DataSet
 
 
-def create_row(conn, sql_statement, entries):
-    c = conn.cursor()
-    c.executemany(sql_statement, entries)
-    conn.commit()
+class Database:
+    """
+
+    """
+
+    def __init__(self):
+        """
+
+        """
+        self.db_name = os.getenv('DB_NAME')
+        self.user = os.getenv('DB_USER')
+        self.passwd = os.getenv('DB_PASSWORD')
+
+    def connexion(self):
+        """
+
+        """
+        db = records.Database(
+            f"""mysql+mysqlconnector://{self.user}:{self.passwd}@localhost:3306/
+            {self.db_name}?charset=utf8mb4"""
+        )
+
+        db.query(f'USE {self.db_name}')
+        
+        return db
 
 
 def main():
-    conn = create_connection()
-    categories_ = get_categories()
-    category = [(id, category['name']) for id, category in enumerate(categories_, 1)]
-    grades = ('a', 'b', 'c', 'd', 'e')
-    nutrition_grade = [(id, grade) for id, grade in enumerate(grades, 1)]
-    product = []
-    for idx in range(len(categories_)):
-        products = get_category_products(categories_, idx + 1)
-        element = [
-                    (
-                        product['code'],
-				        product['product_name_fr'],
-				        product['ingredients_text_fr'],
-				        product['stores'],
-                        product['nutrition_grade_fr'],
-                        idx + 1
+    """
 
-                    ) 
-				        for product in products 
-                        if 'nutrition_grade_fr' in product.keys() 
-                        and product['code'] 
-                        and product['product_name_fr'] 
-                        and product['ingredients_text_fr'] 
-                        and product['stores'] 
-                        and product['nutrition_grade_fr'] != ''
-                ]
-        product += element
+    """
+    #creating the structure of the database
+    database = Database()
+    session = database.connexion()
+    session.query('DROP TABLE products')
+    session.query('DROP TABLE categories')
+    session.query(sql.CREATE_CATEGORIES)
+    session.query(sql.CREATE_PRODUCTS)
 
-    with conn:
-        create_table(conn, CREATE_CATEGORIES)
-        create_table(conn, CREATE_PRODUCTS)
-        create_table(conn, CREATE_NUTRITION_GRADE)
-        #create_table(conn, CREATE_PRODUCT_CATEGORY)
-        create_row(conn, INSERT_INTO_CATEGORIES, category)
-        create_row(conn, INSERT_INTO_NUTRITION_GRADE, nutrition_grade)
-        create_row(conn, INSERT_INTO_PRODUCTS, product)
+    #creating the data to fill de DB
+    data = DataSet()
+    data.get_categories()
+    categories = data.categories['tags'][5:10]
+    products = []
+    for key in range(len(categories)):
+        elements = data.get_products(categories, key + 1)
+        dataset = data.clean_dataset(elements)
+        for product in dataset:
+            products.append(product)
+    
+    #filling categories table
+    for category in categories:
+        name = category['name']
+        session.query(sql.INSERT_INTO_CATEGORIES, name=name)
+    
+
+    #filling products table
+    for product in products:
+            name = product['product_name_fr']
+            nutriscore = product['nutrition_grade_fr']
+            stores = product['stores']
+            category_id = product['category_id']
+            session.query(sql.INSERT_INTO_PRODUCTS, name=name, nutriscore=nutriscore, stores=stores, category_id=category_id)
+    
+            
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

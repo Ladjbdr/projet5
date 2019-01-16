@@ -1,28 +1,58 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from database import create_connection
-from process_data import get_categories, get_category_products
+"""
 
+"""
 
 import sqlite3
 
-categories='\t1.Plats préparés \t2.Boissons sans alcool \t3.Aliments à base de fruits et légumes \t4.Céréales et pommes de terre \t5.Biscuits et gateaux'
-print('welcome to pure beurre\n')
-category_choice = int(input(f'\tchoose a category:\n\n\t{categories}\n'))
-conn = create_connection()
-#if category == '1':
-with conn:
-    c=conn.cursor()
-    c.execute(f"""select name from products where category_id={category_choice}""")
-    res_=c.fetchall()
-    products_=[product[0] for product in res_]
-    for product in enumerate(products_, 1):
-        print('\t', product[0], product[1])
-    product_choice=(int(input('\n choose a product: \n')))
-    sql_req = f"""select * from products where name="{products_[product_choice - 1]}" """
-    c.execute(sql_req)
-    res_req=c.fetchone()
-    _,name,ingredient,_,note,_ = res_req
+import records
 
-    print('\nNom: ', name, '\nIngrédients: ', ingredient, '\nNote Nutritionelle: ', note.upper())
+db = records.Database('sqlite:///pure_beurre.db')
+
+cat_ = db.query('select * from categories')
+print('select a category:\n')
+for row in cat_:
+    print(row.id, row.name, end='\t', flush=True)
+print(end='\n')
+cat_choice = int(input('\nCategory: \n'))
+
+
+prod_ = db.query(f'select name from products where category_id = {cat_choice}')
+for id, prod in enumerate(prod_.as_dict(), 1):
+    print(id, prod['name'])
+prod_choice = int(input('select a product:'))
+
+
+
+
+subst_ = db.query(f"""select name, nutrition_grade
+                     from products
+                     where category_id = {cat_choice}
+                     and nutrition_grade <= (
+                                             select nutrition_grade
+                                             from products
+                                             where name = "{prod_[prod_choice - 1].name}")
+                     and product_group = (select product_group
+                                          from products
+                                          where name = "{prod_[prod_choice - 1].name}")
+                     limit 3
+                 """)
+for id, subst in enumerate(subst_.as_dict(), 1):
+    print(id, subst['name'], subst['nutrition_grade'])
+subst_choice = int(input('select a substitue:'))
+
+substitute = db.query(f'select * from products where name = "{subst_[subst_choice - 1].name}"')
+sub_details = substitute.as_dict()[0]
+for key, value in sub_details.items():
+    print(key, ': ', value)
+
+response = input('record to database? (Y/N)')
+if response == 'y':
+    db.query(f"""update products 
+                 set substitute_id = (select rowid
+                                      from products
+                                      where name = "{substitute.first().name}")
+                 where name = "{prod_[prod_choice - 1].name}" """)
+    
