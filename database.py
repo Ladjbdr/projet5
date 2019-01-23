@@ -15,7 +15,7 @@ from data import DataSet
 
 class Database:
     """
-
+    this class is responsible of the connexion to the database.
     """
 
     def __init__(self):
