@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-
+this module is responsible of creating the database.
 """
 
 import os
@@ -20,7 +20,7 @@ class Database:
 
     def __init__(self):
         """
-
+        initialize session.
         """
         self.db_name = os.getenv('DB_NAME')
         self.user = os.getenv('DB_USER')
@@ -28,7 +28,7 @@ class Database:
 
     def connexion(self):
         """
-
+        connexion to database.
         """
         db = records.Database(
             f"""mysql+mysqlconnector://{self.user}:{self.passwd}@localhost:3306/
@@ -41,9 +41,6 @@ class Database:
 
 
 def main():
-    """
-
-    """
     #creating the structure of the database
     database = Database()
     session = database.connexion()
@@ -71,14 +68,19 @@ def main():
 
     #filling products table
     for product in products:
-            name = product['product_name_fr']
-            nutriscore = product['nutrition_grade_fr']
+            name = product['name']
+            nutriscore = product['nutriscore']
             stores = product['stores']
+            subcategory = product['subcategory']
             category_id = product['category_id']
-            session.query(sql.INSERT_INTO_PRODUCTS, name=name, nutriscore=nutriscore, stores=stores, category_id=category_id)
+            session.query(
+                sql.INSERT_INTO_PRODUCTS, 
+                name=name, 
+                nutriscore=nutriscore, 
+                stores=stores, 
+                subcategory=subcategory, 
+                category_id=category_id
+            )
     
-            
-
-
 if __name__ == '__main__':
     main()

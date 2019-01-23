@@ -17,11 +17,6 @@ class DataSet:
     """
     url = 'https://fr.openfoodfacts.org/categories.json'
     search_url = 'https://fr.openfoodfacts.org/cgi/search.pl'
-    index = [
-            'product_name_fr', 
-            'nutrition_grade_fr', 
-            'stores', 
-            ]
 
     def __init__(self):
         """
@@ -73,19 +68,21 @@ class DataSet:
 
     def clean_dataset(self, products):
         """
-
+        this method is responsible of making a clean dataset out of the data.
         """
         products = [
             {
-                'product_name_fr': product.get('product_name_fr'),
-                'nutrition_grade_fr': product.get('nutrition_grade_fr'),
+                'name': product.get('product_name_fr'),
+                'nutriscore': product.get('nutrition_grade_fr'),
                 'stores': product.get('stores'),
+                'subcategory': product.get('pnns_groups_2'),
                 'category_id': product.get('category_id'),
             }
             for product in self.products
             if  bool(product.get('product_name_fr'))
             and bool(product.get('nutrition_grade_fr'))
             and bool(product.get('stores'))
+            and bool(product.get('pnns_groups_2'))
             and bool(product.get('category_id')) != False
         ]
 
@@ -93,9 +90,6 @@ class DataSet:
 
 
 def main():
-    """
-
-    """
     data = DataSet()
     data.get_categories()
     categories = data.categories['tags'][5:10]
