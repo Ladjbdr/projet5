@@ -8,8 +8,6 @@ substitutes.
 """
 
 import records
-import pandas as pd
-import numpy as np
 
 from database import Database
 import sql_statements as sql
