@@ -44,8 +44,6 @@ def main():
     #creating the structure of the database
     database = Database()
     session = database.connexion()
-    session.query('DROP TABLE products')
-    session.query('DROP TABLE categories')
     session.query(sql.CREATE_CATEGORIES)
     session.query(sql.CREATE_PRODUCTS)
 
