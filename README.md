@@ -108,8 +108,3 @@ stores :  Auchan
 
 Record to database? (Y/N)
 ```
-
-## Author
-
-
-
